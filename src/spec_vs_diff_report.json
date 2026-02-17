@@ -1,0 +1,76 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-17T01:15:29.974Z",
+  "summary": "Diff adds a new Motoko backend actor with product catalog CRUD (admin-only) and Stripe session operations, plus a new React storefront with routing, cart, Stripe success/cancel pages, and an admin UI (products + Stripe setup). Some required backend API/role-bootstrap pieces are not evidenced in the diff, and a few extra features were added that were not requested.",
+  "missing_requirements": [
+    {
+      "id": "REQ-2",
+      "requirement": "Backend exposes query methods to list products and fetch a product by id.",
+      "reason": "The backend shows a query method to list products (getProducts) but no query method to fetch a single product by id is present in the provided backend diff excerpt.",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "requirement": "Documented/configurable way to set the initial admin Principal (the requester) so they have admin permissions after signing in with Internet Identity.",
+      "reason": "The diff shows admin checks via AccessControl and an actor initialization call using a URL secret token (_initializeAccessControlWithSecret), but it does not evidence configuration of an initial admin Principal as requested.",
+      "evidence": [
+        "backend/main.mo",
+        "frontend/src/hooks/useActor.ts"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "User profile creation/storage flow (name profile) with a mandatory profile setup modal and related backend profile APIs.",
+      "reason": "The BuildRequest does not ask for user profiles or a required onboarding modal; this is additional functionality beyond storefront/Stripe/admin requirements.",
+      "evidence": [
+        "backend/main.mo",
+        "frontend/src/components/auth/ProfileSetupModal.tsx",
+        "frontend/src/components/layout/StoreLayout.tsx",
+        "frontend/src/hooks/useQueries.ts"
+      ]
+    },
+    {
+      "description": "Admin bootstrap/initialization via a secret URL parameter (caffeineAdminToken) and actor method _initializeAccessControlWithSecret.",
+      "reason": "The BuildRequest specifies initial admin via a configurable Principal; it does not request a secret-token-based bootstrap mechanism via URL parameters.",
+      "evidence": [
+        "frontend/src/hooks/useActor.ts"
+      ]
+    }
+  ],
+  "confidence": 0.62,
+  "changed_files": [
+    "all_files_summary.json",
+    "backend/main.mo",
+    "frontend-file-summaries.txt",
+    "frontend/index.css",
+    "frontend/index.html",
+    "frontend/src/App.tsx",
+    "frontend/src/components/auth/AdminRouteGuard.tsx",
+    "frontend/src/components/auth/LoginButton.tsx",
+    "frontend/src/components/auth/ProfileSetupModal.tsx",
+    "frontend/src/components/layout/StoreLayout.tsx",
+    "frontend/src/components/store/ProductCard.tsx",
+    "frontend/src/hooks/useActor.ts",
+    "frontend/src/hooks/useInternetIdentity.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/index.css",
+    "frontend/src/lib/utils.ts",
+    "frontend/src/main.tsx",
+    "frontend/src/pages/CartPage.tsx",
+    "frontend/src/pages/PaymentFailurePage.tsx",
+    "frontend/src/pages/PaymentSuccessPage.tsx",
+    "frontend/src/pages/ProductDetailPage.tsx",
+    "frontend/src/pages/StorefrontPage.tsx",
+    "frontend/src/pages/admin/AdminDashboardPage.tsx",
+    "frontend/src/pages/admin/AdminProductsPage.tsx",
+    "frontend/src/pages/admin/AdminStripeSetupPage.tsx",
+    "frontend/src/state/cart.ts",
+    "frontend/src/utils/urlParams.ts",
+    "frontend/tailwind.config.js",
+    "project_state.json"
+  ]
+}

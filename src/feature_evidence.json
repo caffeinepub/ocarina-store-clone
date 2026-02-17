@@ -1,0 +1,134 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-recreate-the-storefront-ui-and-product-catalog-to-match-the-store-at-https-ocarinalearning-sw1-caffeine-xyz-store-including-core-pages-and-interactions-needed-to-browse-items-and-start-a-purchase",
+      "featureTitle": "Recreate the storefront UI and product catalog to match the store at https://ocarinalearning-sw1.caffeine.xyz/store, including core pages and interactions needed to browse items and start a purchase.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/layout/StoreLayout.tsx",
+        "frontend/src/components/store/ProductCard.tsx",
+        "frontend/src/pages/CartPage.tsx",
+        "frontend/src/pages/ProductDetailPage.tsx",
+        "frontend/src/pages/StorefrontPage.tsx",
+        "frontend/src/state/cart.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "http-outcalls@3.0.0",
+        "stripe@3.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-a-motoko-backed-product-catalog-api-to-serve-storefront-data-items-prices-images-metadata-and-support-reading-the-catalog-from-the-frontend",
+      "featureTitle": "Implement a Motoko-backed product catalog API to serve storefront data (items, prices, images/metadata) and support reading the catalog from the frontend.",
+      "files": [
+        "frontend/src/pages/ProductDetailPage.tsx",
+        "frontend/src/pages/StorefrontPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "http-outcalls@3.0.0",
+        "stripe@3.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-stripe-payment-setup-so-authenticated-users-can-purchase-store-items-via-stripe-checkout-or-equivalent-stripe-hosted-flow-including-success-cancel-handling-and-an-order-record-stored-in-the-backend",
+      "featureTitle": "Add Stripe payment setup so authenticated users can purchase store items via Stripe Checkout (or equivalent Stripe-hosted flow), including success/cancel handling and an order record stored in the backend.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/pages/CartPage.tsx",
+        "frontend/src/pages/PaymentFailurePage.tsx",
+        "frontend/src/pages/PaymentSuccessPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "http-outcalls@3.0.0",
+        "stripe@3.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-an-admin-role-and-admin-only-ui-for-managing-the-store-at-minimum-create-edit-delete-products-and-update-prices-make-the-requester-an-admin-by-allowing-configuration-of-an-initial-admin-principal-and-enforcing-admin-only-access-in-the-backend-and-frontend",
+      "featureTitle": "Add an admin role and admin-only UI for managing the store (at minimum: create/edit/delete products and update prices). Make the requester an admin by allowing configuration of an initial admin Principal and enforcing admin-only access in the backend and frontend.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/auth/AdminRouteGuard.tsx",
+        "frontend/src/components/auth/LoginButton.tsx",
+        "frontend/src/components/auth/ProfileSetupModal.tsx",
+        "frontend/src/components/layout/StoreLayout.tsx",
+        "frontend/src/pages/admin/AdminDashboardPage.tsx",
+        "frontend/src/pages/admin/AdminProductsPage.tsx",
+        "frontend/src/pages/admin/AdminStripeSetupPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "http-outcalls@3.0.0",
+        "stripe@3.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-apply-a-coherent-visual-theme-across-the-app-colors-typography-spacing-and-component-styling-appropriate-for-an-online-store-avoid-a-blue-purple-primary-palette-unless-explicitly-requested",
+      "featureTitle": "Apply a coherent visual theme across the app (colors, typography, spacing, and component styling) appropriate for an online store; avoid a blue/purple primary palette unless explicitly requested.",
+      "files": [
+        "frontend/src/components/layout/StoreLayout.tsx",
+        "frontend/src/index.css",
+        "frontend/tailwind.config.js"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "http-outcalls@3.0.0",
+        "stripe@3.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "kind": "build_request",
+  "title": "Clone referenced store, add Stripe checkout, and add admin role",
+  "projectName": "Ocarina Store Clone",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Recreate the storefront UI and product catalog to match the store at https://ocarinalearning-sw1.caffeine.xyz/store, including core pages and interactions needed to browse items and start a purchase.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "https://ocarinalearning-sw1.caffeine.xyz/store copy this store"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Storefront provides product listing comparable to the referenced store (at minimum: list/grid of items with name, price, image; item detail view or equivalent).",
+        "Users can add items to a cart (or equivalent pre-checkout selection) and see an order summary before paying.",
+        "All user-facing text is in English."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Implement a Motoko-backed product catalog API to serve storefront data (items, prices, images/metadata) and support reading the catalog from the frontend.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "copy this store"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Frontend loads product catalog data from the backend canister (not hard-coded only in the UI).",
+        "Backend exposes query methods to list products and fetch a product by id.",
+        "Product ids are stable and can be referenced in cart/checkout requests."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Add Stripe payment setup so authenticated users can purchase store items via Stripe Checkout (or equivalent Stripe-hosted flow), including success/cancel handling and an order record stored in the backend.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "make stripe payment setup to buy store items"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Frontend provides a checkout action that creates a Stripe session for the selected cart items and redirects the user to Stripe for payment.",
+        "After returning from Stripe success/cancel URLs, the app shows a clear confirmation/cancellation screen in English.",
+        "Backend stores an order record that includes: purchaser principal, line items, totals, Stripe session id, and a payment status that can be confirmed after redirect.",
+        "Stripe secret key is not exposed in the frontend bundle (kept in backend configuration/secret handling)."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Add an admin role and admin-only UI for managing the store (at minimum: create/edit/delete products and update prices). Make the requester an admin by allowing configuration of an initial admin Principal and enforcing admin-only access in the backend and frontend.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "make me admin"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Admin-only routes/pages are inaccessible to non-admin users (UI hides controls and backend rejects unauthorized calls).",
+        "Admin UI supports product CRUD operations and price updates, persisted via backend methods.",
+        "There is a documented/configurable way to set the initial admin Principal (the requester) so they have admin permissions after signing in with Internet Identity."
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Apply a coherent visual theme across the app (colors, typography, spacing, and component styling) appropriate for an online store; avoid a blue/purple primary palette unless explicitly requested.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "copy this store"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Storefront, product views, cart/checkout, and admin pages share consistent styling and layout.",
+        "Theme uses a distinct, cohesive palette and typography (not default unstyled components), and does not rely on a blue/purple primary color scheme."
+      ]
+    }
+  ],
+  "constraints": [
+    "Backend must remain a single Motoko actor (no additional backend services).",
+    "Do not edit files under frontend immutable paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui (compose them instead).",
+    "Stripe secret material must not be shipped to the client."
+  ],
+  "nonGoals": [
+    "Implementing third-party auth providers other than Internet Identity.",
+    "Real-time order updates via websockets/push notifications.",
+    "Supporting non-Stripe payment methods."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [
+      "User-facing text should be in English."
+    ],
+    "preferencesToRemove": [],
+    "miscToAdd": [
+      "Wants to clone the store at https://ocarinalearning-sw1.caffeine.xyz/store, add Stripe payments, and be made an admin."
+    ],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
+  }
+}

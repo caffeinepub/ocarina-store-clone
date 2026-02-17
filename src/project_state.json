@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "Clone the referenced online store, add Stripe-based checkout for purchasing store items, and provide an admin role for managing the store.",
+  "architectural_notes": [],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-recreate-the-storefront-ui-and-product-catalog-to-match-the-store-at-https-ocarinalearning-sw1-caffeine-xyz-store-including-core-pages-and-interactions-needed-to-browse-items-and-start-a-purchase",
+      "title": "Recreate the storefront UI and product catalog to match the store at https://ocarinalearning-sw1.caffeine.xyz/store, including core pages and interactions needed to browse items and start a purchase.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-motoko-backed-product-catalog-api-to-serve-storefront-data-items-prices-images-metadata-and-support-reading-the-catalog-from-the-frontend",
+      "title": "Implement a Motoko-backed product catalog API to serve storefront data (items, prices, images/metadata) and support reading the catalog from the frontend.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-stripe-payment-setup-so-authenticated-users-can-purchase-store-items-via-stripe-checkout-or-equivalent-stripe-hosted-flow-including-success-cancel-handling-and-an-order-record-stored-in-the-backend",
+      "title": "Add Stripe payment setup so authenticated users can purchase store items via Stripe Checkout (or equivalent Stripe-hosted flow), including success/cancel handling and an order record stored in the backend.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-admin-role-and-admin-only-ui-for-managing-the-store-at-minimum-create-edit-delete-products-and-update-prices-make-the-requester-an-admin-by-allowing-configuration-of-an-initial-admin-principal-and-enforcing-admin-only-access-in-the-backend-and-frontend",
+      "title": "Add an admin role and admin-only UI for managing the store (at minimum: create/edit/delete products and update prices). Make the requester an admin by allowing configuration of an initial admin Principal and enforcing admin-only access in the backend and frontend.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-apply-a-coherent-visual-theme-across-the-app-colors-typography-spacing-and-component-styling-appropriate-for-an-online-store-avoid-a-blue-purple-primary-palette-unless-explicitly-requested",
+      "title": "Apply a coherent visual theme across the app (colors, typography, spacing, and component styling) appropriate for an online store; avoid a blue/purple primary palette unless explicitly requested.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Replicate the existing store from the provided URL (storefront UI and item catalog)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Integrate Stripe payments to allow users to purchase store items",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Create an admin role/account for the user with permissions to manage the store",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Ocarina Store Clone",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}
