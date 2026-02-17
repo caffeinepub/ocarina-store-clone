@@ -12,6 +12,7 @@ export default function AdminRouteGuard({ children }: AdminRouteGuardProps) {
   const { identity } = useInternetIdentity();
   const { data: isAdmin, isLoading } = useIsCallerAdmin();
 
+  // Check authentication first
   if (!identity) {
     return (
       <div className="container py-12">
@@ -26,6 +27,7 @@ export default function AdminRouteGuard({ children }: AdminRouteGuardProps) {
     );
   }
 
+  // Show loading state while checking admin status
   if (isLoading) {
     return (
       <div className="container py-12">
@@ -34,6 +36,7 @@ export default function AdminRouteGuard({ children }: AdminRouteGuardProps) {
     );
   }
 
+  // Check admin status
   if (!isAdmin) {
     return (
       <div className="container py-12">

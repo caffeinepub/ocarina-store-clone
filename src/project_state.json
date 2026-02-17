@@ -1,8 +1,10 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 3,
+  "projectStateVersion": 5,
   "summary": "Clone the referenced online store, add Stripe-based checkout for purchasing store items, and provide an admin role for managing the store.",
-  "architectural_notes": [],
+  "architectural_notes": [
+    "Use Internet Identity for authentication; admin privileges should be tied to an authenticated Principal (configure initial admin Principal)."
+  ],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
@@ -45,6 +47,14 @@
         "REQ-5"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-verify-and-fix-any-frontend-integration-issues-preventing-internet-identity-login-from-enabling-admin-functionality-so-that-after-the-requester-logs-in-the-admin-navigation-entry-appears-and-all-admin-pages-are-accessible-only-to-admins",
+      "title": "Verify and fix any frontend integration issues preventing Internet Identity login from enabling admin functionality, so that after the requester logs in, the Admin navigation entry appears and all admin pages are accessible only to admins.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -64,6 +74,28 @@
       "id": "AR-3",
       "summary": "Create an admin role/account for the user with permissions to manage the store",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Add Internet Identity authentication for admin login (make requester able to log in as admin)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Ensure the backend exposes the admin/user role queries used by the frontend so Internet Identity authenticated users can be recognized as admins (for example: implement the canister methods expected by the UI such as `isCallerAdmin()` and `getCallerUserRole()` if they are missing).",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Make the requester able to log in with Internet Identity and be treated as an admin by supporting configuration of an initial admin Principal in the backend (deploy-time or equivalent configuration), and ensure that principal has admin permissions in the access-control state.",
+      "reqIds": [
+        "REQ-7"
+      ],
       "status": "pending"
     }
   ],

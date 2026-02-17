@@ -1,14 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Recreate the referenced Ocarina store storefront with a Motoko-backed product catalog, add Stripe Checkout purchasing for authenticated users, and provide an admin role with admin-only product management.
+**Goal:** Make Internet Identity login enable full admin functionality end-to-end for the requester, with correct role/admin checks across backend and frontend.
 
 **Planned changes:**
-- Rebuild the storefront UI to match the referenced store’s core browsing and purchase-start interactions (product list/grid, product details or equivalent, cart/order summary).
-- Add Motoko backend canister query methods to list products and fetch product details by stable product id; wire the frontend to load catalog data from the backend.
-- Implement Stripe Checkout flow for authenticated users: create checkout session from cart items, redirect to Stripe, handle success/cancel return pages, and store order records in the backend (including purchaser principal, line items, totals, Stripe session id, payment status).
-- Add admin role with configurable initial admin Principal; enforce admin-only access in backend and hide/disable admin UI for non-admin users.
-- Provide admin UI for product CRUD and price updates, persisted via backend methods.
-- Apply a coherent store theme (non-blue/purple primary palette) consistently across storefront, cart/checkout, and admin pages.
+- Add/align backend canister methods used by the frontend for admin/role queries (e.g., `isCallerAdmin()` and `getCallerUserRole()`), ensuring safe behavior for anonymous callers.
+- Support configuring an initial admin Principal at deploy-time (or equivalent configuration) and persist/reflect that principal in backend access-control state.
+- Fix frontend integration so Internet Identity login correctly updates admin state: show Admin navigation only for admins and gate admin pages with clear “Authentication Required” / “Access Denied” states.
 
-**User-visible outcome:** Users can browse products loaded from the backend, add items to a cart, and complete payment through Stripe Checkout with clear success/cancel pages; the configured admin can sign in with Internet Identity and manage products and prices via an admin-only interface.
+**User-visible outcome:** After logging in with Internet Identity, the configured admin principal sees the Admin link and can access admin pages (dashboard, products CRUD, Stripe setup), while logged-out users and non-admin users are blocked with appropriate messages.

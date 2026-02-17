@@ -1,210 +1,31 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Ocarina Store Clone — Frontend storefront, Stripe checkout flow, and admin UI",
+  "title": "Fix Internet Identity admin gating and navigation visibility",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Recreate storefront UI (catalog browsing, product view, cart, and pre-checkout order summary) matching the referenced store’s core interactions.",
+      "id": "REQ-8",
+      "summary": "Fix Internet Identity frontend integration so admin navigation and admin-page access reflect authenticated admin status",
       "acceptanceCriteria": [
-        "Storefront provides product listing comparable to the referenced store (at minimum: list/grid of items with name, price, image; item detail view or equivalent).",
-        "Users can add items to a cart (or equivalent pre-checkout selection) and see an order summary before paying.",
-        "All user-facing text is in English."
+        "When not logged in, admin pages show an \"Authentication Required\" message and do not display admin content.",
+        "When logged in as a non-admin, admin pages show an \"Access Denied\" message and do not display admin content.",
+        "When logged in as the configured admin principal, the Admin link is visible in the header and the admin pages load successfully (dashboard, products CRUD page, Stripe setup page)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/App.tsx",
-          "operation": "create",
-          "description": "Create the main app shell + routing for storefront pages (catalog, product details, cart/order summary, and checkout entry). Ensure pages are navigable and no orphan views remain."
-        },
-        {
-          "path": "frontend/src/pages/StorefrontPage.tsx",
-          "operation": "create",
-          "description": "Implement the main store catalog page (grid/list of items with image, name, and price) with interactions to open an item and add to cart."
-        },
-        {
-          "path": "frontend/src/pages/ProductDetailPage.tsx",
-          "operation": "create",
-          "description": "Implement an item detail view (image, name, description, price, quantity selector, add-to-cart)."
-        },
-        {
-          "path": "frontend/src/pages/CartPage.tsx",
-          "operation": "create",
-          "description": "Implement cart/order summary UI (line items, quantities, subtotal/total display, remove/update quantity, proceed to checkout)."
-        },
-        {
-          "path": "frontend/src/state/cart.ts",
-          "operation": "create",
-          "description": "Add cart state utilities (add/remove/update/clear; compute totals) stored in memory and optionally persisted in localStorage."
-        },
-        {
-          "path": "frontend/src/components/store/ProductCard.tsx",
-          "operation": "create",
-          "description": "Create a reusable product card composed from existing shadcn-ui primitives (do not edit frontend/src/components/ui). Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/store/Price.tsx",
-          "operation": "create",
-          "description": "Create a small formatter component for currency display (e.g., USD) and consistent price typography."
-        },
-        {
-          "path": "frontend/src/components/layout/StoreLayout.tsx",
-          "operation": "create",
-          "description": "Create a shared store layout (header with navigation to Store + Cart, footer, consistent spacing) used by storefront pages."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Load and render the product catalog from the backend canister (not hard-coded) and support product lookup by id for details/cart.",
-      "acceptanceCriteria": [
-        "Frontend loads product catalog data from the backend canister (not hard-coded only in the UI).",
-        "Backend exposes query methods to list products and fetch a product by id.",
-        "Product ids are stable and can be referenced in cart/checkout requests."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useProducts.ts",
-          "operation": "create",
-          "description": "Create React Query hooks to load products from backendInterface.getProducts() and provide cached access for listing/detail rendering."
-        },
-        {
-          "path": "frontend/src/hooks/useProductById.ts",
-          "operation": "create",
-          "description": "Create a derived hook to select a product from the cached catalog by id (or refetch catalog if missing) for the product detail page."
-        },
-        {
-          "path": "frontend/src/pages/StorefrontPage.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Wire catalog UI to useProducts() and render product images via ExternalBlob.getDirectURL() (blob-storage component). Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/ProductDetailPage.tsx",
-          "operation": "modify",
-          "description": "Wire product detail UI to useProductById() and ensure cart additions reference stable product.id."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Add Stripe-hosted checkout flow for authenticated users (create session, redirect, success/cancel pages) without exposing Stripe secrets.",
-      "acceptanceCriteria": [
-        "Frontend provides a checkout action that creates a Stripe session for the selected cart items and redirects the user to Stripe for payment.",
-        "After returning from Stripe success/cancel URLs, the app shows a clear confirmation/cancellation screen in English.",
-        "Backend stores an order record that includes: purchaser principal, line items, totals, Stripe session id, and a payment status that can be confirmed after redirect.",
-        "Stripe secret key is not exposed in the frontend bundle (kept in backend configuration/secret handling)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useCreateCheckoutSession.ts",
-          "operation": "create",
-          "description": "Implement a checkout mutation using backendInterface.createCheckoutSession(items, successUrl, cancelUrl), JSON-parse the result, validate non-empty session.url, and return {id,url}. Use the stripe component flow; verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/CartPage.tsx",
-          "operation": "modify",
-          "description": "Add a Checkout button that (a) requires login, (b) maps cart line items to ShoppingItem[], calls useCreateCheckoutSession, and redirects via window.location.href to session.url (never router navigation)."
-        },
-        {
-          "path": "frontend/src/pages/PaymentSuccessPage.tsx",
-          "operation": "create",
-          "description": "Add a payment success screen in English. Read session_id from URL, call backendInterface.getStripeSessionStatus(sessionId) to show status/confirmation and provide a link back to the store."
-        },
-        {
-          "path": "frontend/src/pages/PaymentFailurePage.tsx",
-          "operation": "create",
-          "description": "Add a payment cancellation/failure screen in English with guidance to retry and link back to cart/store."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Register routes for /payment-success and /payment-failure and ensure navigation reaches these pages after Stripe redirect."
-        },
-        {
-          "path": "frontend/src/components/auth/RequireAuthenticated.tsx",
-          "operation": "create",
-          "description": "Create a wrapper that blocks checkout actions and any authenticated-only pages when identity is missing (authorization component guidance). Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Add admin-only UI for managing products and Stripe configuration, with frontend route guarding based on backend-reported admin role and initial admin configuration support.",
-      "acceptanceCriteria": [
-        "Admin-only routes/pages are inaccessible to non-admin users (UI hides controls and backend rejects unauthorized calls).",
-        "Admin UI supports product CRUD operations and price updates, persisted via backend methods.",
-        "There is a documented/configurable way to set the initial admin Principal (the requester) so they have admin permissions after signing in with Internet Identity."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useCallerRole.ts",
-          "operation": "create",
-          "description": "Create React Query hooks to load backendInterface.getCallerUserRole() / isCallerAdmin() and expose role/admin booleans for UI gating (authorization component). Verify the component's usage instructions before implementing."
+          "description": "Update the admin-check query hook to better support the authorization component flow: allow the caller to disable admin queries when not authenticated, and handle backend authorization/admin-check errors gracefully (treat as non-admin) so the UI can reliably render \"Authentication Required\" / \"Access Denied\" states without breaking. Verify the component's usage instructions before implementing."
         },
         {
           "path": "frontend/src/components/auth/AdminRouteGuard.tsx",
-          "operation": "create",
-          "description": "Create an admin-only route wrapper that renders an Access Denied screen for non-admin users and prevents admin page content from showing (authorization component). Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/admin/AdminDashboardPage.tsx",
-          "operation": "create",
-          "description": "Create an admin dashboard page with navigation sections for Products and Payments (Stripe config), guarded by AdminRouteGuard."
-        },
-        {
-          "path": "frontend/src/pages/admin/AdminProductsPage.tsx",
-          "operation": "create",
-          "description": "Implement product management UI (create/edit/delete, update price) calling backendInterface.addProduct/updateProduct/deleteProduct and revalidating product queries."
-        },
-        {
-          "path": "frontend/src/pages/admin/AdminStripeSetupPage.tsx",
-          "operation": "create",
-          "description": "Implement Stripe configuration UI using backendInterface.isStripeConfigured() and setStripeConfiguration(); only show setup when not configured, per stripe component guidance. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/auth/ProfileSetupModal.tsx",
-          "operation": "create",
-          "description": "Implement first-login name capture using backendInterface.getCallerUserProfile() and saveCallerUserProfile(), avoiding modal flash per authorization component guidance. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/auth/LoginButton.tsx",
-          "operation": "create",
-          "description": "Add a login/logout button using the existing useInternetIdentity hook and clear React Query cache on logout (authorization component). Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Wire admin routes (e.g., /admin, /admin/products, /admin/payments) and ensure navigation shows Admin entry only for admins."
+          "description": "Ensure admin-route gating uses Internet Identity authentication state first, and only runs admin status checks when authenticated (using the updated admin-check hook). Keep user-facing messaging in English (\"Authentication Required\" vs \"Access Denied\") and ensure admin content never renders for unauthenticated/non-admin users. Verify the component's usage instructions before implementing."
         },
         {
           "path": "frontend/src/components/layout/StoreLayout.tsx",
           "operation": "modify",
-          "description": "Add header login/logout UI, show current user name (from profile), and conditionally show an Admin link when isCallerAdmin() is true."
-        }
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "summary": "Apply a cohesive store-appropriate theme (colors/typography/spacing) that avoids a blue/purple primary palette and is consistent across storefront and admin.",
-      "acceptanceCriteria": [
-        "Storefront, product views, cart/checkout, and admin pages share consistent styling and layout.",
-        "Theme uses a distinct, cohesive palette and typography (not default unstyled components), and does not rely on a blue/purple primary color scheme."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/index.css",
-          "operation": "create",
-          "description": "Define global CSS variables and base styles for a cohesive warm/neutral storefront theme (avoid blue/purple primary), including typography and consistent surface/background tokens used by Tailwind/shadcn theming."
-        },
-        {
-          "path": "frontend/tailwind.config.js",
-          "operation": "modify",
-          "description": "Adjust Tailwind theme extensions (if needed) to align with the chosen palette and consistent radii/spacing for store/admin pages (avoid blue/purple primary)."
-        },
-        {
-          "path": "frontend/src/components/layout/StoreLayout.tsx",
-          "operation": "modify",
-          "description": "Ensure shared layout styling (container widths, spacing, header/footer) is applied consistently across storefront, checkout result pages, and admin pages using composed shadcn-ui primitives (do not edit frontend/src/components/ui). Verify the component's usage instructions before implementing."
+          "description": "Make Admin navigation visibility depend on authenticated admin status without triggering admin checks for anonymous users (avoid unnecessary/fragile calls while logged out). Ensure the Admin link appears after successful Internet Identity login as an admin and disappears on logout. Verify the component's usage instructions before implementing."
         }
       ]
     }

@@ -9,10 +9,12 @@ import { useInternetIdentity } from '../../hooks/useInternetIdentity';
 export default function StoreLayout() {
   const navigate = useNavigate();
   const totalItems = useCartStore((state) => state.getTotalItems());
-  const { data: isAdmin } = useIsCallerAdmin();
-  const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
   const { identity } = useInternetIdentity();
   const isAuthenticated = !!identity;
+  
+  // Only check admin status when authenticated
+  const { data: isAdmin } = useIsCallerAdmin();
+  const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
 
   const showProfileSetup = isAuthenticated && !profileLoading && isFetched && userProfile === null;
 
@@ -35,7 +37,7 @@ export default function StoreLayout() {
               </span>
             )}
             
-            {isAdmin && (
+            {isAuthenticated && isAdmin && (
               <button
                 onClick={() => navigate({ to: '/admin' })}
                 className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors"

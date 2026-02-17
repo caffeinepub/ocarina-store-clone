@@ -1,126 +1,76 @@
 {
   "kind": "build_request",
-  "title": "Clone referenced store, add Stripe checkout, and add admin role",
-  "projectName": "Ocarina Store Clone",
+  "title": "Make Internet Identity admin login fully functional",
+  "projectName": "Ocarina Store",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-1",
-      "text": "Recreate the storefront UI and product catalog to match the store at https://ocarinalearning-sw1.caffeine.xyz/store, including core pages and interactions needed to browse items and start a purchase.",
+      "id": "REQ-6",
+      "text": "Ensure the backend exposes the admin/user role queries used by the frontend so Internet Identity authenticated users can be recognized as admins (for example: implement the canister methods expected by the UI such as `isCallerAdmin()` and `getCallerUserRole()` if they are missing).",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "make it functional, with internet identity log in for admin, me."
+        ]
+      },
+      "acceptanceCriteria": [
+        "The backend candid includes callable methods that match what the frontend calls for admin checks (e.g., `isCallerAdmin()` returns a Bool and `getCallerUserRole()` returns a role type).",
+        "When called by an authenticated principal, the role/admin checks return results consistent with the backend’s access-control state (admin principals return true for `isCallerAdmin()`; non-admin principals return false).",
+        "Unauthenticated callers (anonymous) do not cause the canister to trap during admin checks; they should return a safe value (e.g., false) or a controlled error that the UI can handle."
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Make the requester able to log in with Internet Identity and be treated as an admin by supporting configuration of an initial admin Principal in the backend (deploy-time or equivalent configuration), and ensure that principal has admin permissions in the access-control state.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "make it functional, with internet identity log in for admin, me."
+        ]
+      },
+      "acceptanceCriteria": [
+        "There is a clear, repeatable way to set an initial admin Principal for a new deployment (documented in code via comments/config), without requiring any external auth provider beyond Internet Identity.",
+        "After logging in with Internet Identity as the configured initial admin principal, the backend authorizes admin-only methods (add/update/delete product, set Stripe configuration) without trapping for authorization.",
+        "A non-admin Internet Identity principal cannot successfully call admin-only backend methods and receives an authorization error/trap as before."
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "text": "Verify and fix any frontend integration issues preventing Internet Identity login from enabling admin functionality, so that after the requester logs in, the Admin navigation entry appears and all admin pages are accessible only to admins.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-6"
         ],
         "quotes": [
-          "https://ocarinalearning-sw1.caffeine.xyz/store copy this store"
+          "make it functional, with internet identity log in for admin, me."
         ]
       },
       "acceptanceCriteria": [
-        "Storefront provides product listing comparable to the referenced store (at minimum: list/grid of items with name, price, image; item detail view or equivalent).",
-        "Users can add items to a cart (or equivalent pre-checkout selection) and see an order summary before paying.",
-        "All user-facing text is in English."
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Implement a Motoko-backed product catalog API to serve storefront data (items, prices, images/metadata) and support reading the catalog from the frontend.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "copy this store"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Frontend loads product catalog data from the backend canister (not hard-coded only in the UI).",
-        "Backend exposes query methods to list products and fetch a product by id.",
-        "Product ids are stable and can be referenced in cart/checkout requests."
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Add Stripe payment setup so authenticated users can purchase store items via Stripe Checkout (or equivalent Stripe-hosted flow), including success/cancel handling and an order record stored in the backend.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "make stripe payment setup to buy store items"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Frontend provides a checkout action that creates a Stripe session for the selected cart items and redirects the user to Stripe for payment.",
-        "After returning from Stripe success/cancel URLs, the app shows a clear confirmation/cancellation screen in English.",
-        "Backend stores an order record that includes: purchaser principal, line items, totals, Stripe session id, and a payment status that can be confirmed after redirect.",
-        "Stripe secret key is not exposed in the frontend bundle (kept in backend configuration/secret handling)."
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Add an admin role and admin-only UI for managing the store (at minimum: create/edit/delete products and update prices). Make the requester an admin by allowing configuration of an initial admin Principal and enforcing admin-only access in the backend and frontend.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "make me admin"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Admin-only routes/pages are inaccessible to non-admin users (UI hides controls and backend rejects unauthorized calls).",
-        "Admin UI supports product CRUD operations and price updates, persisted via backend methods.",
-        "There is a documented/configurable way to set the initial admin Principal (the requester) so they have admin permissions after signing in with Internet Identity."
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "text": "Apply a coherent visual theme across the app (colors, typography, spacing, and component styling) appropriate for an online store; avoid a blue/purple primary palette unless explicitly requested.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "copy this store"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Storefront, product views, cart/checkout, and admin pages share consistent styling and layout.",
-        "Theme uses a distinct, cohesive palette and typography (not default unstyled components), and does not rely on a blue/purple primary color scheme."
+        "When not logged in, admin pages show an \"Authentication Required\" message and do not display admin content.",
+        "When logged in as a non-admin, admin pages show an \"Access Denied\" message and do not display admin content.",
+        "When logged in as the configured admin principal, the Admin link is visible in the header and the admin pages load successfully (dashboard, products CRUD page, Stripe setup page)."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor (no additional backend services).",
-    "Do not edit files under frontend immutable paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui (compose them instead).",
-    "Stripe secret material must not be shipped to the client."
+    "Backend must remain a single Motoko actor in backend/main.mo; do not introduce additional backend services.",
+    "Do not edit any files under frontend/src/components/ui or any paths listed in frontend.immutablePaths; compose existing components instead.",
+    "Use English for all user-facing UI text."
   ],
   "nonGoals": [
-    "Implementing third-party auth providers other than Internet Identity.",
-    "Real-time order updates via websockets/push notifications.",
-    "Supporting non-Stripe payment methods."
+    "Adding any authentication system other than Internet Identity.",
+    "Implementing real-time features (WebSockets), external databases, or third-party auth providers.",
+    "Changing the storefront UI beyond what is required to ensure Internet Identity/admin functionality works end-to-end."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [
-      "User-facing text should be in English."
-    ],
-    "preferencesToRemove": [],
-    "miscToAdd": [
-      "Wants to clone the store at https://ocarinalearning-sw1.caffeine.xyz/store, add Stripe payments, and be made an admin."
-    ],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

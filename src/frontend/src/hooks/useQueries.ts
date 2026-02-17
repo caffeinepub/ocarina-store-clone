@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import type { Product, UserProfile, UserRole, StripeConfiguration, ShoppingItem, StripeSessionStatus } from '../backend';
 import { Principal } from '@dfinity/principal';
+import { useInternetIdentity } from './useInternetIdentity';
 
 export function useGetProducts() {
   const { actor, isFetching } = useActor();
@@ -65,16 +66,32 @@ export function useGetCallerUserRole() {
 }
 
 export function useIsCallerAdmin() {
-  const { actor, isFetching } = useActor();
+  const { actor, isFetching: actorFetching } = useActor();
+  const { identity } = useInternetIdentity();
+  const isAuthenticated = !!identity;
 
-  return useQuery<boolean>({
+  const query = useQuery<boolean>({
     queryKey: ['isCallerAdmin'],
     queryFn: async () => {
       if (!actor) return false;
-      return actor.isCallerAdmin();
+      try {
+        return await actor.isCallerAdmin();
+      } catch (error) {
+        // Handle authorization errors gracefully - treat as non-admin
+        console.error('Admin check error:', error);
+        return false;
+      }
     },
-    enabled: !!actor && !isFetching,
+    enabled: !!actor && !actorFetching && isAuthenticated,
+    retry: false,
   });
+
+  return {
+    ...query,
+    // When not authenticated, immediately return false without loading
+    data: isAuthenticated ? query.data : false,
+    isLoading: isAuthenticated ? (actorFetching || query.isLoading) : false,
+  };
 }
 
 export function useAddProduct() {
