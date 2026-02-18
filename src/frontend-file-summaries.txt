@@ -1,6 +1,6 @@
 {
   "frontend/src/App.tsx": "Main application component with TanStack Router setup, defining all routes for storefront, cart, payment flows, and admin pages, wrapped with ThemeProvider and Toaster.",
-  "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations; useIsCallerAdmin now only runs when authenticated and handles authorization errors gracefully by returning false instead of throwing.",
+  "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations including new hooks for payment method options (useGetPaymentMethodOptions, useSetPaymentMethodOptions) and hardened error handling in useCreateCheckoutSession with enhanced JSON parsing and validation.",
   "frontend/src/state/cart.ts": "Zustand store for cart state management with localStorage persistence, handling add/remove/update items and price calculations.",
   "frontend/src/components/layout/StoreLayout.tsx": "Main layout component with header navigation; Admin link now only appears when both authenticated AND admin status is confirmed true.",
   "frontend/src/components/auth/LoginButton.tsx": "Authentication button component using Internet Identity, handles login/logout with query cache clearing on logout.",
@@ -9,12 +9,12 @@
   "frontend/src/components/store/ProductCard.tsx": "Reusable product card component displaying product image, name, description, price, and add-to-cart button.",
   "frontend/src/pages/StorefrontPage.tsx": "Main store page displaying product grid with loading states, integrates with cart and navigation to product details.",
   "frontend/src/pages/ProductDetailPage.tsx": "Product detail page with large image, description, quantity selector, and add-to-cart functionality.",
-  "frontend/src/pages/CartPage.tsx": "Shopping cart page with item list, quantity controls, order summary, and Stripe checkout integration requiring authentication.",
+  "frontend/src/pages/CartPage.tsx": "Shopping cart page with enhanced checkout error logging that captures detailed error information for debugging while maintaining user-friendly error toasts.",
   "frontend/src/pages/PaymentSuccessPage.tsx": "Payment success confirmation page that clears cart and displays order confirmation with session status.",
   "frontend/src/pages/PaymentFailurePage.tsx": "Payment cancellation page with options to return to cart or continue shopping.",
   "frontend/src/pages/admin/AdminDashboardPage.tsx": "Admin dashboard with navigation cards to product management and payment settings, protected by AdminRouteGuard.",
   "frontend/src/pages/admin/AdminProductsPage.tsx": "Admin product management page with CRUD operations, image upload, and product listing with edit/delete actions.",
-  "frontend/src/pages/admin/AdminStripeSetupPage.tsx": "Admin Stripe configuration page for setting up secret key and allowed countries, shows configuration status.",
+  "frontend/src/pages/admin/AdminStripeSetupPage.tsx": "Admin Stripe configuration page with secret key, allowed countries, and four payment method toggles (Card, Cryptocurrency, Cash App, AU Bank Account) with validation requiring at least one method selected and informational cards about payment method availability.",
   "frontend/src/lib/utils.ts": "Utility functions including cn for className merging and formatPrice for currency formatting.",
   "frontend/src/index.css": "Global styles with warm/neutral OKLCH color system for both light and dark modes, avoiding blue/purple primary colors.",
   "frontend/tailwind.config.js": "Tailwind configuration with custom color tokens, Inter font family, and extended theme for consistent store design."

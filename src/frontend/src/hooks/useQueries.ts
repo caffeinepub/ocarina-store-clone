@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { Product, UserProfile, UserRole, StripeConfiguration, ShoppingItem, StripeSessionStatus } from '../backend';
+import type { Product, UserProfile, UserRole, StripeConfiguration, ShoppingItem, StripeSessionStatus, PaymentMethodOptions } from '../backend';
 import { Principal } from '@dfinity/principal';
 import { useInternetIdentity } from './useInternetIdentity';
 
@@ -167,18 +167,64 @@ export function useSetStripeConfiguration() {
   });
 }
 
+export function useGetPaymentMethodOptions() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<PaymentMethodOptions>({
+    queryKey: ['paymentMethodOptions'],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.getPaymentMethodOptions();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useSetPaymentMethodOptions() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (options: PaymentMethodOptions) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.setPaymentMethodOptions(options);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['paymentMethodOptions'] });
+    },
+  });
+}
+
 export function useCreateCheckoutSession() {
   const { actor } = useActor();
 
   return useMutation({
     mutationFn: async ({ items, successUrl, cancelUrl }: { items: ShoppingItem[]; successUrl: string; cancelUrl: string }) => {
       if (!actor) throw new Error('Actor not available');
-      const result = await actor.createCheckoutSession(items, successUrl, cancelUrl);
-      const session = JSON.parse(result) as { id: string; url: string };
-      if (!session?.url) {
-        throw new Error('Stripe session missing url');
+      
+      try {
+        const result = await actor.createCheckoutSession(items, successUrl, cancelUrl);
+        
+        // Harden JSON parsing with better error handling
+        let session: { id: string; url: string };
+        try {
+          session = JSON.parse(result) as { id: string; url: string };
+        } catch (parseError) {
+          throw new Error(`Failed to parse checkout session response: ${parseError instanceof Error ? parseError.message : 'Invalid JSON'}`);
+        }
+        
+        if (!session?.url || session.url.trim() === '') {
+          throw new Error('Stripe session response missing valid url field');
+        }
+        
+        return session;
+      } catch (error) {
+        // Re-throw with enhanced context for debugging
+        if (error instanceof Error) {
+          throw new Error(`Checkout session creation failed: ${error.message}`);
+        }
+        throw new Error('Checkout session creation failed with unknown error');
       }
-      return session;
     },
   });
 }

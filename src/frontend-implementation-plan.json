@@ -1,31 +1,46 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix Internet Identity admin gating and navigation visibility",
+  "title": "Admin UI support for additional Stripe Checkout payment methods",
   "requirements": [
     {
-      "id": "REQ-8",
-      "summary": "Fix Internet Identity frontend integration so admin navigation and admin-page access reflect authenticated admin status",
+      "id": "REQ-10",
+      "summary": "Update the admin Payment Settings UI to configure enabled Stripe payment methods (card, crypto, Cash App, AU direct debit) with validation and English toasts.",
       "acceptanceCriteria": [
-        "When not logged in, admin pages show an \"Authentication Required\" message and do not display admin content.",
-        "When logged in as a non-admin, admin pages show an \"Access Denied\" message and do not display admin content.",
-        "When logged in as the configured admin principal, the Admin link is visible in the header and the admin pages load successfully (dashboard, products CRUD page, Stripe setup page)."
+        "The Payment Settings page includes toggles/checkboxes for: Card, Cryptocurrency, Cash App, and AU Bank Account (AU direct debit).",
+        "Saving payment settings updates the backend configuration via the existing `setStripeConfiguration` mutation and shows success/failure toasts in English.",
+        "The UI validates that at least one payment method is selected before allowing save (or defaults to Card enabled if none selected, as an explicit UI behavior)."
       ],
       "file_operations": [
         {
           "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Update the admin-check query hook to better support the authorization component flow: allow the caller to disable admin queries when not authenticated, and handle backend authorization/admin-check errors gracefully (treat as non-admin) so the UI can reliably render \"Authentication Required\" / \"Access Denied\" states without breaking. Verify the component's usage instructions before implementing."
+          "description": "Add React Query hooks for payment-method settings: fetch current options via the backend capability `getPaymentMethodOptions` and save via `setPaymentMethodOptions`, including cache invalidation. Use the Stripe integration patterns where relevant. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/components/auth/AdminRouteGuard.tsx",
+          "path": "frontend/src/pages/admin/AdminStripeSetupPage.tsx",
           "operation": "modify",
-          "description": "Ensure admin-route gating uses Internet Identity authentication state first, and only runs admin status checks when authenticated (using the updated admin-check hook). Keep user-facing messaging in English (\"Authentication Required\" vs \"Access Denied\") and ensure admin content never renders for unauthenticated/non-admin users. Verify the component's usage instructions before implementing."
+          "description": "Extend the existing Payment Settings form to include four method toggles/checkboxes with clear English labels (Card, Cryptocurrency, Cash App, AU Bank Account (AU direct debit)), load initial values from `useGetPaymentMethodOptions`, and save by calling `setStripeConfiguration` (existing behavior) plus `setPaymentMethodOptions`. Enforce validation that at least one method is selected before saving (or implement an explicit default-to-Card behavior) and show English success/failure toasts. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-11",
+      "summary": "Ensure the storefront checkout flow gracefully handles checkout-session creation with the updated Stripe configuration and logs useful errors.",
+      "acceptanceCriteria": [
+        "With Card + at least one additional method enabled in admin settings, creating a checkout session succeeds and the hosted Stripe Checkout page shows the enabled methods when Stripe deems them eligible.",
+        "If an enabled method is ineligible (e.g., unsupported currency/country), the app fails gracefully (toast on frontend: \"Failed to create checkout session\") and logs a useful error for debugging."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Harden `useCreateCheckoutSession` error handling: wrap JSON parsing to provide a clearer thrown error when the backend returns non-JSON or a missing `url`, and ensure the thrown message is suitable for higher-level logging. Keep the Stripe redirect contract (require non-empty `url`). Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/components/layout/StoreLayout.tsx",
+          "path": "frontend/src/pages/CartPage.tsx",
           "operation": "modify",
-          "description": "Make Admin navigation visibility depend on authenticated admin status without triggering admin checks for anonymous users (avoid unnecessary/fragile calls while logged out). Ensure the Admin link appears after successful Internet Identity login as an admin and disappears on logout. Verify the component's usage instructions before implementing."
+          "description": "Improve checkout failure diagnostics while preserving the existing graceful UX: keep the English toast \"Failed to create checkout session\", and expand console logging to include the caught error message/shape for debugging (without exposing secrets). Verify the component's usage instructions before implementing."
         }
       ]
     }

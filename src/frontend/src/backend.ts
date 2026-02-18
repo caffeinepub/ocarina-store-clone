@@ -104,6 +104,12 @@ export interface _CaffeineStorageCreateCertificateResult {
     method: string;
     blob_hash: string;
 }
+export interface PaymentMethodOptions {
+    allowCreditCards: boolean;
+    allowCashApp: boolean;
+    allowCryptoPayments: boolean;
+    allowDirectDebit: boolean;
+}
 export interface http_header {
     value: string;
     name: string;
@@ -171,12 +177,14 @@ export interface backendInterface {
     deleteProduct(productId: string): Promise<void>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getPaymentMethodOptions(): Promise<PaymentMethodOptions>;
     getProducts(): Promise<Array<Product>>;
     getStripeSessionStatus(sessionId: string): Promise<StripeSessionStatus>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     isStripeConfigured(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    setPaymentMethodOptions(options: PaymentMethodOptions): Promise<void>;
     setStripeConfiguration(config: StripeConfiguration): Promise<void>;
     transform(input: TransformationInput): Promise<TransformationOutput>;
     updateProduct(product: Product): Promise<void>;
@@ -366,6 +374,20 @@ export class Backend implements backendInterface {
             return from_candid_UserRole_n14(this._uploadFile, this._downloadFile, result);
         }
     }
+    async getPaymentMethodOptions(): Promise<PaymentMethodOptions> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getPaymentMethodOptions();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getPaymentMethodOptions();
+            return result;
+        }
+    }
     async getProducts(): Promise<Array<Product>> {
         if (this.processError) {
             try {
@@ -447,6 +469,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.saveCallerUserProfile(arg0);
+            return result;
+        }
+    }
+    async setPaymentMethodOptions(arg0: PaymentMethodOptions): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.setPaymentMethodOptions(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.setPaymentMethodOptions(arg0);
             return result;
         }
     }

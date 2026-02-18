@@ -41,6 +41,12 @@ export const ShoppingItem = IDL.Record({
   'productDescription' : IDL.Text,
 });
 export const UserProfile = IDL.Record({ 'name' : IDL.Text });
+export const PaymentMethodOptions = IDL.Record({
+  'allowCreditCards' : IDL.Bool,
+  'allowCashApp' : IDL.Bool,
+  'allowCryptoPayments' : IDL.Bool,
+  'allowDirectDebit' : IDL.Bool,
+});
 export const StripeSessionStatus = IDL.Variant({
   'completed' : IDL.Record({
     'userPrincipal' : IDL.Opt(IDL.Text),
@@ -109,6 +115,7 @@ export const idlService = IDL.Service({
   'deleteProduct' : IDL.Func([IDL.Text], [], []),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getPaymentMethodOptions' : IDL.Func([], [PaymentMethodOptions], ['query']),
   'getProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
   'getStripeSessionStatus' : IDL.Func([IDL.Text], [StripeSessionStatus], []),
   'getUserProfile' : IDL.Func(
@@ -119,6 +126,7 @@ export const idlService = IDL.Service({
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'isStripeConfigured' : IDL.Func([], [IDL.Bool], ['query']),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'setPaymentMethodOptions' : IDL.Func([PaymentMethodOptions], [], []),
   'setStripeConfiguration' : IDL.Func([StripeConfiguration], [], []),
   'transform' : IDL.Func(
       [TransformationInput],
@@ -164,6 +172,12 @@ export const idlFactory = ({ IDL }) => {
     'productDescription' : IDL.Text,
   });
   const UserProfile = IDL.Record({ 'name' : IDL.Text });
+  const PaymentMethodOptions = IDL.Record({
+    'allowCreditCards' : IDL.Bool,
+    'allowCashApp' : IDL.Bool,
+    'allowCryptoPayments' : IDL.Bool,
+    'allowDirectDebit' : IDL.Bool,
+  });
   const StripeSessionStatus = IDL.Variant({
     'completed' : IDL.Record({
       'userPrincipal' : IDL.Opt(IDL.Text),
@@ -229,6 +243,7 @@ export const idlFactory = ({ IDL }) => {
     'deleteProduct' : IDL.Func([IDL.Text], [], []),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getPaymentMethodOptions' : IDL.Func([], [PaymentMethodOptions], ['query']),
     'getProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
     'getStripeSessionStatus' : IDL.Func([IDL.Text], [StripeSessionStatus], []),
     'getUserProfile' : IDL.Func(
@@ -239,6 +254,7 @@ export const idlFactory = ({ IDL }) => {
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'isStripeConfigured' : IDL.Func([], [IDL.Bool], ['query']),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'setPaymentMethodOptions' : IDL.Func([PaymentMethodOptions], [], []),
     'setStripeConfiguration' : IDL.Func([StripeConfiguration], [], []),
     'transform' : IDL.Func(
         [TransformationInput],

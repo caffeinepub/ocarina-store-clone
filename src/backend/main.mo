@@ -9,7 +9,9 @@ import Runtime "mo:core/Runtime";
 import Principal "mo:core/Principal";
 import Storage "blob-storage/Storage";
 import MixinStorage "blob-storage/Mixin";
+import Migration "migration";
 
+(with migration = Migration.run)
 actor {
   include MixinStorage();
 
@@ -82,24 +84,54 @@ actor {
     products.remove(productId);
   };
 
-  // Stripe integration
-  var configuration : ?Stripe.StripeConfiguration = null;
+  // Stripe integration with advanced payment options
+  public type PaymentMethodOptions = {
+    allowCreditCards : Bool;
+    allowCryptoPayments : Bool;
+    allowCashApp : Bool;
+    allowDirectDebit : Bool;
+  };
 
-  public query func isStripeConfigured() : async Bool {
-    configuration != null;
+  var stripeConfiguration : ?Stripe.StripeConfiguration = null;
+  var paymentMethodOptions : PaymentMethodOptions = {
+    allowCreditCards = true;
+    allowCryptoPayments = false;
+    allowCashApp = false;
+    allowDirectDebit = false;
+  };
+
+  public query ({ caller }) func isStripeConfigured() : async Bool {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can check Stripe configuration");
+    };
+    stripeConfiguration != null;
   };
 
   public shared ({ caller }) func setStripeConfiguration(config : Stripe.StripeConfiguration) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can perform this action");
     };
-    configuration := ?config;
+    stripeConfiguration := ?config;
+  };
+
+  public shared ({ caller }) func setPaymentMethodOptions(options : PaymentMethodOptions) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can update payment methods");
+    };
+    paymentMethodOptions := options;
+  };
+
+  public query ({ caller }) func getPaymentMethodOptions() : async PaymentMethodOptions {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view payment method configuration");
+    };
+    paymentMethodOptions;
   };
 
   func getStripeConfiguration() : Stripe.StripeConfiguration {
-    switch (configuration) {
+    switch (stripeConfiguration) {
       case (null) { Runtime.trap("Stripe needs to be first configured") };
-      case (?value) { value };
+      case (?config) { config };
     };
   };
 

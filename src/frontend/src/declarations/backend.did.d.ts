@@ -11,6 +11,12 @@ import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
 export type ExternalBlob = Uint8Array;
+export interface PaymentMethodOptions {
+  'allowCreditCards' : boolean,
+  'allowCashApp' : boolean,
+  'allowCryptoPayments' : boolean,
+  'allowDirectDebit' : boolean,
+}
 export interface Product {
   'id' : string,
   'name' : string,
@@ -90,12 +96,14 @@ export interface _SERVICE {
   'deleteProduct' : ActorMethod<[string], undefined>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getPaymentMethodOptions' : ActorMethod<[], PaymentMethodOptions>,
   'getProducts' : ActorMethod<[], Array<Product>>,
   'getStripeSessionStatus' : ActorMethod<[string], StripeSessionStatus>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'isStripeConfigured' : ActorMethod<[], boolean>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'setPaymentMethodOptions' : ActorMethod<[PaymentMethodOptions], undefined>,
   'setStripeConfiguration' : ActorMethod<[StripeConfiguration], undefined>,
   'transform' : ActorMethod<[TransformationInput], TransformationOutput>,
   'updateProduct' : ActorMethod<[Product], undefined>,

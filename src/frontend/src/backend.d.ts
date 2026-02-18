@@ -22,6 +22,12 @@ export interface TransformationOutput {
     body: Uint8Array;
     headers: Array<http_header>;
 }
+export interface PaymentMethodOptions {
+    allowCreditCards: boolean;
+    allowCashApp: boolean;
+    allowCryptoPayments: boolean;
+    allowDirectDebit: boolean;
+}
 export interface http_header {
     value: string;
     name: string;
@@ -78,12 +84,14 @@ export interface backendInterface {
     deleteProduct(productId: string): Promise<void>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getPaymentMethodOptions(): Promise<PaymentMethodOptions>;
     getProducts(): Promise<Array<Product>>;
     getStripeSessionStatus(sessionId: string): Promise<StripeSessionStatus>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     isStripeConfigured(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    setPaymentMethodOptions(options: PaymentMethodOptions): Promise<void>;
     setStripeConfiguration(config: StripeConfiguration): Promise<void>;
     transform(input: TransformationInput): Promise<TransformationOutput>;
     updateProduct(product: Product): Promise<void>;

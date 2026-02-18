@@ -1,76 +1,90 @@
 {
   "kind": "build_request",
-  "title": "Make Internet Identity admin login fully functional",
-  "projectName": "Ocarina Store",
+  "title": "Enable additional Stripe payment methods (card, cryptocurrency, Cash App, AU bank account)",
+  "projectName": "Ocarina Store Clone",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-6",
-      "text": "Ensure the backend exposes the admin/user role queries used by the frontend so Internet Identity authenticated users can be recognized as admins (for example: implement the canister methods expected by the UI such as `isCallerAdmin()` and `getCallerUserRole()` if they are missing).",
+      "id": "REQ-9",
+      "text": "Extend the backend Stripe configuration so an admin can enable Stripe Checkout payment methods for: card, cryptocurrency, Cash App, and Australian bank account (AU direct debit), and persist these settings in the canister configuration used by checkout-session creation.",
       "target": "backend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-user-payment-methods",
+          "msg-user-retry"
         ],
         "quotes": [
-          "make it functional, with internet identity log in for admin, me."
+          "allow all payment methods available on stripe card, cryptocurrency, cash app, au bank account",
+          "retry"
         ]
       },
       "acceptanceCriteria": [
-        "The backend candid includes callable methods that match what the frontend calls for admin checks (e.g., `isCallerAdmin()` returns a Bool and `getCallerUserRole()` returns a role type).",
-        "When called by an authenticated principal, the role/admin checks return results consistent with the backend’s access-control state (admin principals return true for `isCallerAdmin()`; non-admin principals return false).",
-        "Unauthenticated callers (anonymous) do not cause the canister to trap during admin checks; they should return a safe value (e.g., false) or a controlled error that the UI can handle."
+        "Admin can set Stripe configuration with secret key, allowed countries, and enabled payment methods including: card, cryptocurrency, Cash App, and AU bank account (AU direct debit).",
+        "If cryptocurrency/Cash App/AU bank account are not available for the Stripe account or region, the backend surfaces a clear error message (trap or returned error) rather than silently misconfiguring checkout.",
+        "The backend uses the configured payment-method settings when calling Stripe to create a Checkout Session."
       ]
     },
     {
-      "id": "REQ-7",
-      "text": "Make the requester able to log in with Internet Identity and be treated as an admin by supporting configuration of an initial admin Principal in the backend (deploy-time or equivalent configuration), and ensure that principal has admin permissions in the access-control state.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-6"
-        ],
-        "quotes": [
-          "make it functional, with internet identity log in for admin, me."
-        ]
-      },
-      "acceptanceCriteria": [
-        "There is a clear, repeatable way to set an initial admin Principal for a new deployment (documented in code via comments/config), without requiring any external auth provider beyond Internet Identity.",
-        "After logging in with Internet Identity as the configured initial admin principal, the backend authorizes admin-only methods (add/update/delete product, set Stripe configuration) without trapping for authorization.",
-        "A non-admin Internet Identity principal cannot successfully call admin-only backend methods and receives an authorization error/trap as before."
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "text": "Verify and fix any frontend integration issues preventing Internet Identity login from enabling admin functionality, so that after the requester logs in, the Admin navigation entry appears and all admin pages are accessible only to admins.",
+      "id": "REQ-10",
+      "text": "Update the admin Payment Settings UI to allow selecting which Stripe payment methods are enabled (card, cryptocurrency, Cash App, AU bank account) in addition to the existing secret key and allowed-countries fields, using clear English labels and validation.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-user-payment-methods",
+          "msg-user-retry"
         ],
         "quotes": [
-          "make it functional, with internet identity log in for admin, me."
+          "allow all payment methods available on stripe card, cryptocurrency, cash app, au bank account",
+          "retry"
         ]
       },
       "acceptanceCriteria": [
-        "When not logged in, admin pages show an \"Authentication Required\" message and do not display admin content.",
-        "When logged in as a non-admin, admin pages show an \"Access Denied\" message and do not display admin content.",
-        "When logged in as the configured admin principal, the Admin link is visible in the header and the admin pages load successfully (dashboard, products CRUD page, Stripe setup page)."
+        "The Payment Settings page includes toggles/checkboxes for: Card, Cryptocurrency, Cash App, and AU Bank Account (AU direct debit).",
+        "Saving payment settings updates the backend configuration via the existing `setStripeConfiguration` mutation and shows success/failure toasts in English.",
+        "The UI validates that at least one payment method is selected before allowing save (or defaults to Card enabled if none selected, as an explicit UI behavior)."
+      ]
+    },
+    {
+      "id": "REQ-11",
+      "text": "Ensure the storefront checkout flow uses the updated Stripe configuration so that, when enabled, Stripe Checkout presents the additional payment methods to the buyer (subject to Stripe eligibility for the account/country/currency).",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-user-payment-methods",
+          "msg-user-retry"
+        ],
+        "quotes": [
+          "allow all payment methods available on stripe card, cryptocurrency, cash app, au bank account",
+          "retry"
+        ]
+      },
+      "acceptanceCriteria": [
+        "With Card + at least one additional method enabled in admin settings, creating a checkout session succeeds and the hosted Stripe Checkout page shows the enabled methods when Stripe deems them eligible.",
+        "If an enabled method is ineligible (e.g., unsupported currency/country), the app fails gracefully (toast on frontend: \"Failed to create checkout session\") and logs a useful error for debugging."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo; do not introduce additional backend services.",
-    "Do not edit any files under frontend/src/components/ui or any paths listed in frontend.immutablePaths; compose existing components instead.",
-    "Use English for all user-facing UI text."
+    "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
+    "Do not modify any files under frontend/src/components/ui or any paths listed as immutable in SYSTEM_CONTEXT.",
+    "Use English for any user-facing text."
   ],
   "nonGoals": [
-    "Adding any authentication system other than Internet Identity.",
-    "Implementing real-time features (WebSockets), external databases, or third-party auth providers.",
-    "Changing the storefront UI beyond what is required to ensure Internet Identity/admin functionality works end-to-end."
+    "Implement non-Stripe payment rails (e.g., native crypto wallets, bank transfers outside Stripe, Cash App integrations outside Stripe).",
+    "Add third-party authentication providers beyond Internet Identity."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

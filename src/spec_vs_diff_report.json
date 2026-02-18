@@ -1,35 +1,80 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-17T01:23:31.902Z",
-  "summary": "Frontend changes add clearer admin gating behavior (distinct unauthenticated vs non-admin messaging) and only show the Admin navigation link when the user is authenticated and confirmed admin. Backend changes shown do not demonstrate the required admin/role query methods or an initial-admin configuration mechanism; however backend diff is truncated so these may exist outside the visible excerpt.",
+  "generatedAt": "2026-02-17T11:06:24.018Z",
+  "summary": "Diff adds payment-method option toggles in the admin Stripe setup page, introduces new backend state/types for PaymentMethodOptions plus a migration module, and improves checkout error logging. However, the diff summary does not clearly show that the backend uses these options when creating Stripe Checkout Sessions or that payment-method eligibility errors are surfaced as required. Also, payment-method saving appears to be done via a new mutation rather than exclusively extending the existing setStripeConfiguration mutation.",
   "missing_requirements": [
     {
-      "id": "REQ-6",
-      "requirement": "Backend exposes role/admin query methods used by the frontend (e.g., `isCallerAdmin()` returning Bool and `getCallerUserRole()` returning a role type) and they behave safely for anonymous callers.",
-      "reason": "The frontend calls `actor.isCallerAdmin()` and `actor.getCallerUserRole()`, but the visible `backend/main.mo` excerpt does not show implementations of `isCallerAdmin` or `getCallerUserRole`, nor any anonymous-safe handling described in the requirement. Because the backend file is truncated, these methods may exist elsewhere, but there is no evidence in the provided diff summary.",
+      "id": "REQ-9",
+      "requirement": "Backend must surface a clear error (trap or returned error) if cryptocurrency/Cash App/AU direct debit are not available for the Stripe account/region, rather than silently misconfiguring checkout.",
+      "reason": "The diff shows new PaymentMethodOptions state and admin setter but does not show any backend validation against Stripe/account/region availability or any explicit error path for ineligible methods.",
       "evidence": [
-        "backend/main.mo (truncated; no `isCallerAdmin`/`getCallerUserRole` shown in excerpt)",
-        "frontend/src/hooks/useQueries.ts (calls `actor.isCallerAdmin()` and `actor.getCallerUserRole()`)"
+        "backend/main.mo (truncated)"
       ]
     },
     {
-      "id": "REQ-7",
-      "requirement": "Support configuration of an initial admin Principal (deploy-time or equivalent) and ensure that principal has admin permissions in access-control state.",
-      "reason": "The visible `backend/main.mo` excerpt shows `accessControlState = AccessControl.initState()` but does not show any deploy-time/config mechanism (e.g., init argument, env var, hardcoded placeholder with comments) that sets an initial admin principal into the access-control state. Backend is truncated, so it may exist outside the excerpt, but there is no evidence in the diff summary.",
+      "id": "REQ-9",
+      "requirement": "Backend must use the configured payment-method settings when calling Stripe to create a Checkout Session.",
+      "reason": "The provided backend diff is truncated before any checkout-session creation code, and no evidence is shown that paymentMethodOptions are applied to Stripe Checkout Session creation.",
       "evidence": [
-        "backend/main.mo (truncated; shows `AccessControl.initState()` but no initial-admin configuration in excerpt)"
+        "backend/main.mo (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "requirement": "Saving payment settings updates the backend configuration via the existing `setStripeConfiguration` mutation.",
+      "reason": "Admin UI saves secret key/allowed countries via `useSetStripeConfiguration`, but saves payment methods via a separate `useSetPaymentMethodOptions` mutation, implying the existing mutation was not extended to include payment methods as requested.",
+      "evidence": [
+        "frontend/src/pages/admin/AdminStripeSetupPage.tsx (truncated)",
+        "frontend/src/hooks/useQueries.ts (truncated)",
+        "frontend-file-summaries.txt"
+      ]
+    },
+    {
+      "id": "REQ-11",
+      "requirement": "Storefront checkout flow must use updated Stripe configuration so enabled methods are presented in Stripe Checkout (subject to eligibility).",
+      "reason": "Frontend checkout now logs errors and shows the required toast, but the diff summary does not show that the backend checkout-session creation incorporates the new payment method configuration, which is necessary for Stripe Checkout to present them.",
+      "evidence": [
+        "frontend/src/pages/CartPage.tsx (truncated)",
+        "backend/main.mo (truncated)"
       ]
     }
   ],
-  "hallucinated_features": [],
-  "confidence": 0.62,
+  "hallucinated_features": [
+    {
+      "description": "Admin UX/access-control related changes (Admin link visibility logic, route-guard behavior differences, login/logout query cache clearing) beyond enabling Stripe payment methods.",
+      "reason": "These changes are not requested by REQ-9/10/11 and are unrelated to enabling additional Stripe payment methods.",
+      "evidence": [
+        "frontend-file-summaries.txt"
+      ]
+    },
+    {
+      "description": "Introduction of a standalone payment-method-options backend API/mutation (`setPaymentMethodOptions`) instead of extending the existing Stripe configuration setter only.",
+      "reason": "BuildRequest specifically calls for extending the backend Stripe configuration and updating it via the existing `setStripeConfiguration` mutation; adding a separate settings API is an unrequested interface change.",
+      "evidence": [
+        "backend/main.mo (truncated)",
+        "frontend/src/pages/admin/AdminStripeSetupPage.tsx (truncated)",
+        "frontend/src/hooks/useQueries.ts (truncated)",
+        "frontend-file-summaries.txt"
+      ]
+    },
+    {
+      "description": "Addition of a backend migration module and migration wiring.",
+      "reason": "Data migration support is not mentioned in the BuildRequest requirements or acceptance criteria.",
+      "evidence": [
+        "backend/migration.mo",
+        "backend/main.mo (truncated)"
+      ]
+    }
+  ],
+  "confidence": 0.68,
   "changed_files": [
     "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/auth/AdminRouteGuard.tsx",
-    "frontend/src/components/layout/StoreLayout.tsx",
     "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/CartPage.tsx",
+    "frontend/src/pages/admin/AdminStripeSetupPage.tsx",
     "project_state.json"
   ]
 }

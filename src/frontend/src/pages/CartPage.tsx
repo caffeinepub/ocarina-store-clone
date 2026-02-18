@@ -54,7 +54,12 @@ export default function CartPage() {
 
       window.location.href = session.url;
     } catch (error) {
-      console.error('Checkout error:', error);
+      // Enhanced error logging for debugging while maintaining user-friendly toast
+      console.error('Checkout error details:', {
+        error,
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       toast.error('Failed to create checkout session');
     }
   };

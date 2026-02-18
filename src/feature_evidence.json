@@ -2,12 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-verify-and-fix-any-frontend-integration-issues-preventing-internet-identity-login-from-enabling-admin-functionality-so-that-after-the-requester-logs-in-the-admin-navigation-entry-appears-and-all-admin-pages-are-accessible-only-to-admins",
-      "featureTitle": "Verify and fix any frontend integration issues preventing Internet Identity login from enabling admin functionality, so that after the requester logs in, the Admin navigation entry appears and all admin pages are accessible only to admins.",
+      "featureId": "feature-update-the-admin-payment-settings-ui-to-allow-selecting-which-stripe-payment-methods-are-enabled-card-cryptocurrency-cash-app-au-bank-account-in-addition-to-the-existing-secret-key-and-allowed-countries-fields-using-clear-english-labels-and-validation",
+      "featureTitle": "Update the admin Payment Settings UI to allow selecting which Stripe payment methods are enabled (card, cryptocurrency, Cash App, AU bank account) in addition to the existing secret key and allowed-countries fields, using clear English labels and validation.",
       "files": [
-        "frontend/src/components/auth/AdminRouteGuard.tsx",
-        "frontend/src/components/layout/StoreLayout.tsx",
-        "frontend/src/hooks/useQueries.ts"
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/admin/AdminStripeSetupPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -21,7 +20,30 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-8"
+        "REQ-10"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-ensure-the-storefront-checkout-flow-uses-the-updated-stripe-configuration-so-that-when-enabled-stripe-checkout-presents-the-additional-payment-methods-to-the-buyer-subject-to-stripe-eligibility-for-the-account-country-currency",
+      "featureTitle": "Ensure the storefront checkout flow uses the updated Stripe configuration so that, when enabled, Stripe Checkout presents the additional payment methods to the buyer (subject to Stripe eligibility for the account/country/currency).",
+      "files": [
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/CartPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "http-outcalls@3.0.0",
+        "stripe@3.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-11"
       ],
       "confidence": "high"
     }

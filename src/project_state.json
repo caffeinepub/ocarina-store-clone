@@ -1,58 +1,26 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 5,
-  "summary": "Clone the referenced online store, add Stripe-based checkout for purchasing store items, and provide an admin role for managing the store.",
-  "architectural_notes": [
-    "Use Internet Identity for authentication; admin privileges should be tied to an authenticated Principal (configure initial admin Principal)."
+  "projectStateVersion": 3,
+  "summary": "Project will support payments via Stripe with multiple payment methods enabled.",
+  "architectural_notes": [],
+  "known_issues": [
+    "Previous build attempt failed with 'AI was unable to complete your request' during payment-method requirements build."
   ],
-  "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-recreate-the-storefront-ui-and-product-catalog-to-match-the-store-at-https-ocarinalearning-sw1-caffeine-xyz-store-including-core-pages-and-interactions-needed-to-browse-items-and-start-a-purchase",
-      "title": "Recreate the storefront UI and product catalog to match the store at https://ocarinalearning-sw1.caffeine.xyz/store, including core pages and interactions needed to browse items and start a purchase.",
+      "id": "feature-update-the-admin-payment-settings-ui-to-allow-selecting-which-stripe-payment-methods-are-enabled-card-cryptocurrency-cash-app-au-bank-account-in-addition-to-the-existing-secret-key-and-allowed-countries-fields-using-clear-english-labels-and-validation",
+      "title": "Update the admin Payment Settings UI to allow selecting which Stripe payment methods are enabled (card, cryptocurrency, Cash App, AU bank account) in addition to the existing secret key and allowed-countries fields, using clear English labels and validation.",
       "reqIds": [
-        "REQ-1"
+        "REQ-10"
       ],
       "version": 1
     },
     {
-      "id": "feature-implement-a-motoko-backed-product-catalog-api-to-serve-storefront-data-items-prices-images-metadata-and-support-reading-the-catalog-from-the-frontend",
-      "title": "Implement a Motoko-backed product catalog API to serve storefront data (items, prices, images/metadata) and support reading the catalog from the frontend.",
+      "id": "feature-ensure-the-storefront-checkout-flow-uses-the-updated-stripe-configuration-so-that-when-enabled-stripe-checkout-presents-the-additional-payment-methods-to-the-buyer-subject-to-stripe-eligibility-for-the-account-country-currency",
+      "title": "Ensure the storefront checkout flow uses the updated Stripe configuration so that, when enabled, Stripe Checkout presents the additional payment methods to the buyer (subject to Stripe eligibility for the account/country/currency).",
       "reqIds": [
-        "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-stripe-payment-setup-so-authenticated-users-can-purchase-store-items-via-stripe-checkout-or-equivalent-stripe-hosted-flow-including-success-cancel-handling-and-an-order-record-stored-in-the-backend",
-      "title": "Add Stripe payment setup so authenticated users can purchase store items via Stripe Checkout (or equivalent Stripe-hosted flow), including success/cancel handling and an order record stored in the backend.",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-an-admin-role-and-admin-only-ui-for-managing-the-store-at-minimum-create-edit-delete-products-and-update-prices-make-the-requester-an-admin-by-allowing-configuration-of-an-initial-admin-principal-and-enforcing-admin-only-access-in-the-backend-and-frontend",
-      "title": "Add an admin role and admin-only UI for managing the store (at minimum: create/edit/delete products and update prices). Make the requester an admin by allowing configuration of an initial admin Principal and enforcing admin-only access in the backend and frontend.",
-      "reqIds": [
-        "REQ-4"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-apply-a-coherent-visual-theme-across-the-app-colors-typography-spacing-and-component-styling-appropriate-for-an-online-store-avoid-a-blue-purple-primary-palette-unless-explicitly-requested",
-      "title": "Apply a coherent visual theme across the app (colors, typography, spacing, and component styling) appropriate for an online store; avoid a blue/purple primary palette unless explicitly requested.",
-      "reqIds": [
-        "REQ-5"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-verify-and-fix-any-frontend-integration-issues-preventing-internet-identity-login-from-enabling-admin-functionality-so-that-after-the-requester-logs-in-the-admin-navigation-entry-appears-and-all-admin-pages-are-accessible-only-to-admins",
-      "title": "Verify and fix any frontend integration issues preventing Internet Identity login from enabling admin functionality, so that after the requester logs in, the Admin navigation entry appears and all admin pages are accessible only to admins.",
-      "reqIds": [
-        "REQ-8"
+        "REQ-11"
       ],
       "version": 1
     }
@@ -60,46 +28,19 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Replicate the existing store from the provided URL (storefront UI and item catalog)",
+      "summary": "Enable all relevant Stripe payment methods (card, cryptocurrency, Cash App, AU bank account)",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Integrate Stripe payments to allow users to purchase store items",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Create an admin role/account for the user with permissions to manage the store",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Add Internet Identity authentication for admin login (make requester able to log in as admin)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-5",
-      "summary": "Ensure the backend exposes the admin/user role queries used by the frontend so Internet Identity authenticated users can be recognized as admins (for example: implement the canister methods expected by the UI such as `isCallerAdmin()` and `getCallerUserRole()` if they are missing).",
+      "summary": "Extend the backend Stripe configuration so an admin can enable Stripe Checkout payment methods for: card, cryptocurrency, Cash App, and Australian bank account (AU direct debit), and persist these settings in the canister configuration used by checkout-session creation.",
       "reqIds": [
-        "REQ-6"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-6",
-      "summary": "Make the requester able to log in with Internet Identity and be treated as an admin by supporting configuration of an initial admin Principal in the backend (deploy-time or equivalent configuration), and ensure that principal has admin permissions in the access-control state.",
-      "reqIds": [
-        "REQ-7"
+        "REQ-9"
       ],
       "status": "pending"
     }
   ],
-  "gameProjectType": "none",
   "projectName": "Ocarina Store Clone",
   "clarification_mode": "instant",
   "clarification_rounds": 0
